@@ -91,6 +91,7 @@ func main() {
 
 	line := ""
 	line1 := ""
+	title := "MPD"
 	// Loop printing the current status of MPD.
 	for {
 		status, err := conn.Status()
@@ -102,12 +103,15 @@ func main() {
 			log.Fatalln(err)
 		}
 		if status["state"] == "play" {
-			line1 = fmt.Sprintf("Now playing: %s - %s", song["Artist"], song["Title"])
+			title = "Now playing"
+			line1 = fmt.Sprintf("%s - %s", song["Artist"], song["Title"])
 		} else {
 			if song["Artist"] == "" {
-				line1 = "Now playing: nothing"
+				title = "Nothing's playing"
+				line1 = ""
 			} else {
-				line1 = fmt.Sprintf("Paused: %s - %s", song["Artist"], song["Title"])
+				title = "Paused"
+				line1 = fmt.Sprintf("%s - %s", song["Artist"], song["Title"])
 			}
 		}
 		if line != line1 {
