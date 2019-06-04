@@ -117,7 +117,7 @@ func main() {
 		if line != line1 {
 			line = line1
 			fmt.Println(line)
-			notify.Push("MPD", line1, "audio-headphones", notificator.UR_NORMAL)
+			notify.Push(title, line1, "audio-headphones", notificator.UR_NORMAL)
 		}
 		time.Sleep(1e9)
 	}
