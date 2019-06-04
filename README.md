@@ -24,5 +24,20 @@ The configuration file is stored at `~/.config/mpdstatus.json`. It is automatica
 ## Daemon
 There's a daemonisable version available, in the `mpdstatus-daemon` folder. The configuration file is the same, but it's stored at `~/.config/mpdstatus-service.json`.
 
+You can use this systemd Unit:
+```
+[Unit]
+Description=MPD status daemon
+
+[Service]
+Type=simple
+
+ExecStart=$HOME/bins/mpdstatus-daemon
+
+[Install]
+WantedBy=default.target
+```
+Dont forget to edit the binary's path.
+
 ## Why
 I had my [bash script](https://github.com/Luclu7/dotfiles/blob/master/i3/.config/i3/nowplaying.sh) which did the exact same thing, but eh, I was bored so I just redid it in Go (ok, copy pasted 80%).
