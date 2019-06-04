@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/0xAX/notificator"
 	"github.com/fhs/gompd/mpd"
+	homedir "github.com/mitchellh/go-homedir"
 	"log"
 	"os"
 	"strconv"
@@ -15,6 +16,14 @@ type configFile struct {
 	Port    int    `json:"port"`
 }
 
+func cfe(err error) bool {
+	if err != nil {
+		log.Panicln(err)
+		return false
+	}
+	return true
+}
+
 var notify *notificator.Notificator
 
 func main() {
@@ -22,14 +31,43 @@ func main() {
 		DefaultIcon: "audio-headphones",
 		AppName:     "MPD",
 	})
-	file, _ := os.Open("config.json")
+
+	homePath, err := homedir.Dir()
+	cfe(err)
+	configFilepath := homePath + "/.config/mpdstatus.json"
+
+	_, err = os.Stat(configFilepath)
+
+	if os.IsNotExist(err) {
+		var file, err = os.Create(configFilepath)
+		cfe(err)
+		// open file using READ & WRITE permission
+		file, err = os.OpenFile(configFilepath, os.O_RDWR, 0644)
+		cfe(err)
+		defer file.Close()
+
+		_, err = file.WriteString("{\n")
+		cfe(err)
+		_, err = file.WriteString("	\"address\": \"localhost\",\n")
+		cfe(err)
+		_, err = file.WriteString("	\"port\": 6600\n")
+		cfe(err)
+		_, err = file.WriteString("}\n")
+		cfe(err)
+		err = file.Sync()
+		cfe(err)
+
+		fmt.Println("The config file was created at", configFilepath)
+
+		defer file.Close()
+	}
+
+	file, _ := os.Open(configFilepath)
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	config := configFile{}
-	err := decoder.Decode(&config)
-	if err != nil {
-		fmt.Println("error:", err)
-	}
+	err = decoder.Decode(&config)
+	cfe(err)
 
 	port := strconv.Itoa(config.Port)
 	addressplusport := config.Address + ":" + port
