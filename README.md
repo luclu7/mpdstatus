@@ -15,7 +15,9 @@ The configuration file is stored at `~/.config/mpdstatus.json`. It is automatica
 ```json
 {
 	"address": "localhost",
-	"port": 6600
+	"port": 6600,
+	"auth": false,
+	"password:" "passwd"
 }
 ```
 

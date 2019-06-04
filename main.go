@@ -12,8 +12,10 @@ import (
 )
 
 type configFile struct {
-	Address string `json:"address"`
-	Port    int    `json:"port"`
+	Address  string `json:"address"`
+	Port     int    `json:"port"`
+	Auth     bool   `json:"auth"`
+	Password string `json:"password"`
 }
 
 func cfe(err error) bool {
@@ -50,7 +52,11 @@ func main() {
 		cfe(err)
 		_, err = file.WriteString("	\"address\": \"localhost\",\n")
 		cfe(err)
-		_, err = file.WriteString("	\"port\": 6600\n")
+		_, err = file.WriteString("	\"port\": 6600,\n")
+		cfe(err)
+		_, err = file.WriteString("	\"auth\": false,\n")
+		cfe(err)
+		_, err = file.WriteString("	\"password\": \"passwd\"\n")
 		cfe(err)
 		_, err = file.WriteString("}\n")
 		cfe(err)
@@ -69,9 +75,14 @@ func main() {
 	err = decoder.Decode(&config)
 	cfe(err)
 
+	var conn *mpd.Client
 	port := strconv.Itoa(config.Port)
 	addressplusport := config.Address + ":" + port
-	conn, err := mpd.Dial("tcp", addressplusport)
+	if config.Auth == false {
+		conn, err = mpd.Dial("tcp", addressplusport)
+	} else {
+		conn, err = mpd.DialAuthenticated("tcp", addressplusport, config.Password)
+	}
 	if err != nil {
 		log.Fatalln(err)
 	}
